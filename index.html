@@ -1,11 +1,545 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>New Webpage</title>
-    </head>
-    <body>
+/**
+ * 2P Snake
+ * Chris X.
+ * 
+ * I've been programming 24 months, and I have learned 89% of Intro to JS.
+ * I made a program that re-creates the classic game Snake
+ * You can read more about it here: https://en.wikipedia.org/wiki/Snake_(video_game)
+ * 
+ * Grab a friend and face off, or just play the CPU.
+ * (Did I make the CPU too hard?)
+*/
 
+scale(width/400,height/400);
 
-    </body>
-</html>
+frameRate(30);
+
+//import font
+var pixelText = function(c,x,y,w) { //character, centerX, centerY, width
+    c = c.toLowerCase(); //not case sensitive
+
+    if (c.length > 1) {
+        for (var i = 0; i < c.length; i++) {
+            pixelText(c.substring(i,i+1),x+(i-c.length/2)*4*w+2*w,y,w);
+        }
+    }
+
+    var wordGrid = [];
+    if (c === 'a') {wordGrid = [1,1,1,1,0,1,1,1,1,1,0,1,1,0,1];}
+    else if (c === 'b') {wordGrid = [1,1,0,1,0,1,1,1,0,1,0,1,1,1,0];}
+    else if (c === 'c') {wordGrid = [1,1,1,1,0,0,1,0,0,1,0,0,1,1,1];}
+    else if (c === 'd') {wordGrid = [1,1,0,1,0,1,1,0,1,1,0,1,1,1,0];}
+    else if (c === 'e') {wordGrid = [1,1,1,1,0,0,1,1,1,1,0,0,1,1,1];}
+    else if (c === 'f') {wordGrid = [1,1,1,1,0,0,1,1,1,1,0,0,1,0,0];}
+    else if (c === 'g') {wordGrid = [1,1,1,1,0,0,1,0,1,1,0,1,1,1,1];}
+    else if (c === 'h') {wordGrid = [1,0,1,1,0,1,1,1,1,1,0,1,1,0,1];}
+    else if (c === 'i') {wordGrid = [1,1,1,0,1,0,0,1,0,0,1,0,1,1,1];}
+    else if (c === 'j') {wordGrid = [1,1,1,0,1,0,0,1,0,0,1,0,1,1,0];}
+    else if (c === 'k') {wordGrid = [1,0,1,1,0,1,1,1,0,1,0,1,1,0,1];}
+    else if (c === 'l') {wordGrid = [1,0,0,1,0,0,1,0,0,1,0,0,1,1,1];}
+    else if (c === 'm') {wordGrid = [1,0,1,1,1,1,1,0,1,1,0,1,1,0,1];}
+    else if (c === 'n') {wordGrid = [1,1,1,1,0,1,1,0,1,1,0,1,1,0,1];}
+    else if (c === 'o') {wordGrid = [1,1,1,1,0,1,1,0,1,1,0,1,1,1,1];}
+    else if (c === 'p') {wordGrid = [1,1,1,1,0,1,1,1,1,1,0,0,1,0,0];}
+    else if (c === 'q') {wordGrid = [1,1,1,1,0,1,1,0,1,1,1,1,0,0,1];}
+    else if (c === 'r') {wordGrid = [1,1,1,1,0,1,1,1,0,1,0,1,1,0,1];}
+    else if (c === 's') {wordGrid = [1,1,1,1,0,0,1,1,1,0,0,1,1,1,1];}
+    else if (c === 't') {wordGrid = [1,1,1,0,1,0,0,1,0,0,1,0,0,1,0];}
+    else if (c === 'u') {wordGrid = [1,0,1,1,0,1,1,0,1,1,0,1,1,1,1];}
+    else if (c === 'v') {wordGrid = [1,0,1,1,0,1,1,0,1,1,0,1,0,1,0];}
+    else if (c === 'w') {wordGrid = [1,0,1,1,0,1,1,0,1,1,1,1,1,0,1];}
+    else if (c === 'x') {wordGrid = [1,0,1,1,0,1,0,1,0,1,0,1,1,0,1];}
+    else if (c === 'y') {wordGrid = [1,0,1,1,0,1,1,1,1,0,0,1,1,1,1];}
+    else if (c === 'z') {wordGrid = [1,1,1,0,0,1,0,1,0,1,0,0,1,1,1];}
+    else if (c === '0') {wordGrid = [1,1,1,1,0,1,1,0,1,1,0,1,1,1,1];}
+    else if (c === '1') {wordGrid = [1,1,0,0,1,0,0,1,0,0,1,0,1,1,1];}
+    else if (c === '2') {wordGrid = [1,1,1,0,0,1,1,1,1,1,0,0,1,1,1];}
+    else if (c === '3') {wordGrid = [1,1,1,0,0,1,1,1,1,0,0,1,1,1,1];}
+    else if (c === '4') {wordGrid = [1,0,1,1,0,1,1,1,1,0,0,1,0,0,1];}
+    else if (c === '5') {wordGrid = [1,1,1,1,0,0,1,1,1,0,0,1,1,1,1];}
+    else if (c === '6') {wordGrid = [1,1,1,1,0,0,1,1,1,1,0,1,1,1,1];}
+    else if (c === '7') {wordGrid = [1,1,1,0,0,1,0,0,1,0,0,1,0,0,1];}
+    else if (c === '8') {wordGrid = [1,1,1,1,0,1,1,1,1,1,0,1,1,1,1];}
+    else if (c === '9') {wordGrid = [1,1,1,1,0,1,1,1,1,0,0,1,1,1,1];}
+    else if (c === ',') {wordGrid = [0,0,0,0,0,0,0,0,0,0,1,0,1,0,0];}
+    else if (c === '.') {wordGrid = [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0];}
+    else if (c === '!') {wordGrid = [0,1,0,0,1,0,0,1,0,0,0,0,0,1,0];}
+    else if (c === '?') {wordGrid = [1,1,1,0,0,1,0,1,1,0,0,0,0,1,0];}
+    
+    for (var i = 0; i < 5; i++) {
+        for (var j = 0; j < 3; j++) {
+            if (wordGrid[i*3+j]) {rect(x-1.5*w+j*w,y-2.5*w+i*w,w,w);}
+        }
+    }
+};
+noStroke();
+
+var started = false;
+var playerSelect = false;
+var nPlayers;
+var instructions = false;
+var spacePressed = false;
+var pointScored = false;
+var gameOver = false;
+
+var field = [];
+//initialize field as empty
+for (var i = 0; i < 80; i++) {
+    field.push([]);
+    for (var j = 0; j < 80; j++) {
+        field[i][j] = 0;
+    }
+}
+
+var p1 = { //red snake
+    x: 19,
+    y: 40,
+    xDir: 1,
+    yDir: 0,
+    dead: false,
+    score: 0,
+    last: 0
+};
+var p2 = { //blue snake
+    x: 60,
+    y: 40,
+    xDir: -1,
+    yDir: 0,
+    dead: false,
+    score: 0,
+    last: 0
+};
+
+var mouseBetween = function(x1,x2,y1,y2) {
+    x1 *= (width / 400);
+    x2 *= (width / 400);
+    y1 *= (height / 400);
+    y2 *= (height / 400);
+    return mouseX > x1 && mouseX < x2 && mouseY > y1 && mouseY < y2;
+};
+var validPoint = function(x,y) {
+    return x >= 0 && x < 80 && y >= 0 && y < 80;
+};
+
+var mouseReleased = function() {
+    if (!started && !instructions && !playerSelect) {
+        if (mouseBetween(143,257,284,316)) {
+            playerSelect = true;
+        }
+    } else if (!started && playerSelect) {
+        if (mouseBetween(107,293,184,216)) {
+            nPlayers = 2;
+            playerSelect = false;
+            instructions = true;
+        } else if (mouseBetween(119,281,259,291)) {
+            nPlayers = 1;
+            playerSelect = false;
+            instructions = true;
+        }
+    } else if (!started && instructions) {
+        if (mouseBetween(106,294,321,357)) {
+            instructions = false;
+            started = true;
+            spacePressed = false;
+        }
+    } else if (gameOver) {
+        if (mouseBetween(59,341,284,316)) {
+            Program.restart();
+        }
+    }
+    //println(mouseX + ' ' + mouseY);
+};
+
+var keyReleased = function() {
+    //reset field when space pressed
+    if (keyCode === 32 && (pointScored || !spacePressed)) {
+        spacePressed = true;
+        pointScored = false;
+        for (var i = 0; i < 80; i++) {
+            for (var j = 0; j < 80; j++) {
+                field[i][j] = 0;
+            }
+        }
+        p1.x = 19;
+        p1.y = 40;
+        p1.xDir = 1;
+        p1.yDir = 0;
+        p1.dead = false;
+        p2.x = 60;
+        p2.y = 40;
+        p2.xDir = -1;
+        p2.yDir = 0;
+        p2.dead = false;
+    }
+};
+
+var keyPressed = function() {
+    //change direction for red snake
+    if (p1.last !== frameCount) {
+        var last = p1.last;
+        p1.last = frameCount;
+        if (keyCode === 65 || (nPlayers === 1 && keyCode === LEFT)) { //a
+            if (p1.xDir !== 1) {
+                p1.xDir = -1;
+                p1.yDir = 0;
+            }
+        } else if (keyCode === 68 || (nPlayers === 1 && keyCode === RIGHT)) { //d
+            if (p1.xDir !== -1) {
+                p1.xDir = 1;
+                p1.yDir = 0;
+            }
+        } else if (keyCode === 87 || (nPlayers === 1 && keyCode === UP)) { //w
+            if (p1.yDir !== 1) {
+                p1.xDir = 0;
+                p1.yDir = -1;
+            }
+        } else if (keyCode === 83 || (nPlayers === 1 && keyCode === DOWN)) { //s
+            if (p1.yDir !== -1) {
+                p1.xDir = 0;
+                p1.yDir = 1;
+            }
+        } else {
+            p1.last = last;
+        }
+    }
+    
+    if (nPlayers === 2) {
+        //change direction for blue snake
+        if (p2.last !== frameCount) {
+            var last = p2.last;
+            p2.last = frameCount;
+            if (keyCode === LEFT) {
+                if (p2.xDir !== 1) {
+                    p2.xDir = -1;
+                    p2.yDir = 0;
+                }
+            } else if (keyCode === RIGHT) {
+                if (p2.xDir !== -1) {
+                    p2.xDir = 1;
+                    p2.yDir = 0;
+                }
+            } else if (keyCode === UP) {
+                if (p2.yDir !== 1) {
+                    p2.xDir = 0;
+                    p2.yDir = -1;
+                }
+            } else if (keyCode === DOWN) {
+                if (p2.yDir !== -1) {
+                    p2.xDir = 0;
+                    p2.yDir = 1;
+                }
+            } else {
+                p2.last = last;
+            }
+        }
+    }
+};
+
+//function for start screen animation
+var drawSquare = function(n) {
+    var sx, sy;
+    if (n < 81) { //top side
+        sx = n*5;
+        sy = 0;
+    } else if (n < 160) { //right side
+        sx = 395;
+        sy = (n-80) * 5;
+    } else if (n < 239) { //bottom side
+        sx = 395 - (n-159)*5;
+        sy = 395;
+    } else { //left side
+        sx = 0;
+        sy = 395 - (n-238)*5;
+    }
+    rect(sx,sy,5,5);
+};
+
+var drawSmiley = function() {
+    rect(185,150,5,15);
+    rect(210,150,5,15);
+    rect(180,175,5,5);
+    rect(185,180,30,5);
+    rect(215,175,5,5);
+};
+
+var turnCPU = function() {
+    var f = field.slice();
+    var mark = [];
+    for (var i = 0; i < 80; i++) {
+        mark.push([]);
+        for (var j = 0; j < 80; j++) {
+            mark[i][j] = false;
+        }
+    }
+    var nSquares1 = 0, nSquares2 = 0;
+    var trap = 6400; //number of squares that constitues "trapping" itself
+    
+    if (p2.xDir === 0) {
+        p2.yDir = 0;
+        
+        //breadth-first search floodfill to find which side has more accessible squares
+        var squares = [];
+        squares.push([p2.x-1,p2.y]);
+        while (squares.length && nSquares1 < trap) {
+            var current = squares[0];
+            squares.splice(0,1);
+            if (validPoint(current[0],current[1]) && field[current[1]][current[0]] === 0 && !mark[current[1]][current[0]]) {
+                nSquares1++;
+                mark[current[1]][current[0]] = true;
+                if (validPoint(current[1]+1,current[0]) && !mark[current[1]+1][current[0]]) {
+                    squares.push([current[0],current[1]+1]);
+                }
+                if (validPoint(current[1]-1,current[0]) && !mark[current[1]-1][current[0]]) {
+                    squares.push([current[0],current[1]-1]);
+                }
+                if (validPoint(current[1],current[0]+1) && !mark[current[1]][current[0]+1]) {
+                    squares.push([current[0]+1,current[1]]);
+                }
+                if (validPoint(current[1],current[0]-1) && !mark[current[1]][current[0]-1]) {
+                    squares.push([current[0]-1,current[1]]);
+                }
+            }
+        }
+        squares.splice(0,squares.length);
+        squares.push([p2.x+1,p2.y]);
+        while (squares.length && nSquares2 < trap) {
+            var current = squares[0];
+            squares.splice(0,1);
+            if (validPoint(current[0],current[1]) && field[current[1]][current[0]] === 0 && !mark[current[1]][current[0]]) {
+                nSquares2++;
+                mark[current[1]][current[0]] = true;
+                if (validPoint(current[1]+1,current[0]) && !mark[current[1]+1][current[0]]) {
+                    squares.push([current[0],current[1]+1]);
+                }
+                if (validPoint(current[1]-1,current[0]) && !mark[current[1]-1][current[0]]) {
+                    squares.push([current[0],current[1]-1]);
+                }
+                if (validPoint(current[1],current[0]+1) && !mark[current[1]][current[0]+1]) {
+                    squares.push([current[0]+1,current[1]]);
+                }
+                if (validPoint(current[1],current[0]-1) && !mark[current[1]][current[0]-1]) {
+                    squares.push([current[0]-1,current[1]]);
+                }
+            }
+        }
+        
+        //turns towards region with more open space
+        if (nSquares1 > nSquares2) {p2.xDir = -1;}
+        else if (nSquares2 > nSquares1) {p2.xDir = 1;}
+        else {p2.xDir = round(random())*2 - 1;}
+    } else {
+        p2.xDir = 0;
+        
+        //bfs floodfill
+        var squares = [];
+        squares.push([p2.x,p2.y-1]);
+        while (squares.length && nSquares1 < trap) {
+            var current = squares[0];
+            squares.splice(0,1);
+            if (validPoint(current[0],current[1]) && field[current[1]][current[0]] === 0 && !mark[current[1]][current[0]]) {
+                nSquares1++;
+                mark[current[1]][current[0]] = true;
+                if (validPoint(current[1]+1,current[0]) && !mark[current[1]+1][current[0]]) {
+                    squares.push([current[0],current[1]+1]);
+                }
+                if (validPoint(current[1]-1,current[0]) && !mark[current[1]-1][current[0]]) {
+                    squares.push([current[0],current[1]-1]);
+                }
+                if (validPoint(current[1],current[0]+1) && !mark[current[1]][current[0]+1]) {
+                    squares.push([current[0]+1,current[1]]);
+                }
+                if (validPoint(current[1],current[0]-1) && !mark[current[1]][current[0]-1]) {
+                    squares.push([current[0]-1,current[1]]);
+                }
+            }
+        }
+        squares.splice(0,squares.length);
+        squares.push([p2.x,p2.y+1]);
+        while (squares.length && nSquares2 < trap) {
+            var current = squares[0];
+            squares.splice(0,1);
+            if (validPoint(current[0],current[1]) && field[current[1]][current[0]] === 0 && !mark[current[1]][current[0]]) {
+                nSquares2++;
+                mark[current[1]][current[0]] = true;
+                if (validPoint(current[1]+1,current[0]) && !mark[current[1]+1][current[0]]) {
+                    squares.push([current[0],current[1]+1]);
+                }
+                if (validPoint(current[1]-1,current[0]) && !mark[current[1]-1][current[0]]) {
+                    squares.push([current[0],current[1]-1]);
+                }
+                if (validPoint(current[1],current[0]+1) && !mark[current[1]][current[0]+1]) {
+                    squares.push([current[0]+1,current[1]]);
+                }
+                if (validPoint(current[1],current[0]-1) && !mark[current[1]][current[0]-1]) {
+                    squares.push([current[0]-1,current[1]]);
+                }
+            }
+        }
+        
+        if (nSquares1 > nSquares2) {p2.yDir = -1;}
+        else if (nSquares2 > nSquares1) {p2.yDir = 1;}
+        else {p2.yDir = round(random())*2 - 1;}
+    }
+    
+    //just in case if I want to see if the algorithm is working, I can println() the output
+    return nSquares1 + ' ' + nSquares2;
+};
+
+var draw = function() {
+    background(0, 0, 0);
+    //moving snakes
+    if (!started) {
+        fill(255,0,0);
+        for (var i = 0; i < 80; i++) {
+            drawSquare((frameCount+i) % 317);
+        }
+        fill(50,50,255);
+        for (var i = 0; i < 80; i++) {
+            drawSquare((frameCount+159+i) % 317);
+        }
+    }
+    
+    if (!started && !playerSelect && !instructions) {
+        fill(255,0,0);
+        pixelText("2 Player",200,100,8);
+        fill(50,50,255);
+        pixelText("Snake",200,150,8);
+        
+        fill(200,200,200);
+        if (mouseBetween(143,257,284,316)) {pixelText("Start",200,300,8);}
+        else {pixelText("Start",200,300,7);}
+    } else if (!started && playerSelect) {
+        fill(255,255,255);
+        pixelText("Play against",200,100,7);
+        
+        fill(255,0,0);
+        if (mouseBetween(107,293,184,216)) {pixelText("A friend",200,200,7);}
+        else {pixelText("A friend",200,200,6);}
+        
+        fill(50,50,255);
+        if (mouseBetween(119,281,259,291)) {pixelText("the CPU",200,275,7);}
+        else {pixelText("the CPU",200,275,6);}
+    } else if (!started && instructions) {
+        fill(255,255,255);
+        pixelText("Instructions",200,50,7);
+        
+        if (nPlayers === 2) {
+            pixelText("Red uses WASD",200,125,5);
+            pixelText("Blue uses Arrows",200,160,5);
+            fill(255,0,0);
+            pixelText("Red",100,125,5);
+            fill(50,50,255);
+            pixelText("Blue",80,160,5);
+            
+            fill(255,255,255);
+            pixelText("do not run into",200,211,3);
+            pixelText("walls or trails",200,234,3);
+            pixelText("First to 5 pts wins!",200,275,3);
+        } else {
+            fill(255,0,0);
+            pixelText("Use WASD or arrow",200,125,5);
+            pixelText("keys to move",200,158,5);
+            fill(255,255,255);
+            pixelText("do not run into",200,213,3);
+            pixelText("walls or trails",200,236,3);
+            pixelText("First to 5 pts wins!",200,279,3);
+        }
+        
+        fill(200,200,200);
+        if (mouseBetween(106,294,321,357)) {pixelText("Got it!",200,339,8);}
+        else {pixelText("Got it!",200,339,7);}
+    } else if (started && !gameOver) {
+        fill(255,0,0);
+        pixelText(p1.score+'',20,20,3);
+        fill(50,50,255);
+        pixelText(p2.score+'',380,20,3);
+        if (!spacePressed) {
+            fill(255,0,0);
+            rect(p1.x*5,p1.y*5,5,5);
+            fill(50,50,255);
+            rect(p2.x*5,p2.y*5,5,5);
+            
+            fill(255,255,255);
+            pixelText("Press Space",200,300,5);
+            pixelText("To Start",200,335,5);
+        } else if (!pointScored) {
+            //update field
+            field[p1.y][p1.x] = 1;
+            field[p2.y][p2.x] = 2;
+            
+            //display field squares
+            for (var i = 0; i < 80; i++) {
+                for (var j = 0; j < 80; j++) {
+                    if (field[i][j] === 1) {fill(255,0,0);}
+                    else if (field[i][j] === 2) {fill(50,50,255);}
+                    else {continue;}
+                    rect(j*5,i*5,5,5);
+                }
+            }
+            
+            //move CPU
+            if (nPlayers === 1) {
+                //randomly change direction
+                if (random() > 0.95) {
+                    turnCPU();
+                }
+                //check to see if CPU is running into anything
+                var tries = 0;
+                while (!validPoint(p2.x+p2.xDir,p2.y+p2.yDir) || field[p2.y+p2.yDir][p2.x+p2.xDir] !== 0) {
+                    turnCPU();
+                    //println(turnCPU());
+                    tries++;
+                    if (tries > 10) {break;}
+                }
+            }
+            
+            //move both snakes
+            p1.x += p1.xDir;
+            p1.y += p1.yDir;
+            p2.x += p2.xDir;
+            p2.y += p2.yDir;
+            
+            //see if snakes run into anything
+            if (!validPoint(p1.x,p1.y) || field[p1.y][p1.x] !== 0) {p1.dead = true;}
+            if (!validPoint(p2.x,p2.y) || field[p2.y][p2.x] !== 0) {p2.dead = true;}
+            
+            //end game
+            if (p1.dead || p2.dead) {
+                pointScored = true;
+                if (p1.dead && !p2.dead) {p2.score++;}
+                else if (!p1.dead && p2.dead) {p1.score++;}
+            }
+        } else {
+            for (var i = 0; i < 80; i++) {
+                for (var j = 0; j < 80; j++) {
+                    if (field[i][j] === 1) {fill(255,0,0);}
+                    else if (field[i][j] === 2) {fill(50,50,255);}
+                    else {continue;}
+                    rect(j*5,i*5,5,5);
+                }
+            }
+            fill(255,255,255);
+            pixelText("Press Space",200,300,5);
+            pixelText("To Continue",200,335,5);
+            
+            if (p1.score === 5 || p2.score === 5) {gameOver = true;}
+        }
+    } else {
+        if (p1.score === 5) {
+            fill(255,0,0);
+            if (nPlayers === 2) {pixelText("P1 Wins!",200,100,10);}
+            else {pixelText("You win!",200,100,10);}
+            drawSmiley();
+        } else {
+            fill(50,50,255);
+            if (nPlayers === 2) {pixelText("P2 Wins!",200,100,10);}
+            else {pixelText("CPU wins!",200,100,10);}
+            drawSmiley();
+        }
+        
+        fill(255,255,255);
+        if (mouseBetween(59,341,284,316)) {pixelText("Back to Menu",200,300,7);}
+        else {pixelText("Back to Menu",200,300,6);}
+    }
+};
+
